@@ -2,7 +2,8 @@ const { getSheetsClient, SPREADSHEET_ID } = require('../config/googleSheets.js')
 const sheets = getSheetsClient();
 
 // ***** 🛠️ CORRECCIÓN DEL NOMBRE DE LA HOJA 🛠️ *****
-const SHEET_NAME = 'Solicitudes de trabajo'; 
+// Pega el valor EXACTO aquí, reemplazando el antiguo
+const SHEET_NAME = 'Form_Responses';
 
 const HEADERS = [
     'MARCA_TEMPORAL', 'NOMBRE_APELLIDO', 'TELEFONO', 'DIRECCION', 
