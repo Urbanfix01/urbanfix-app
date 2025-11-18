@@ -1,0 +1,326 @@
+1. Archivo: package.json
+(En la raíz del proyecto urbanfix-backend). Define cómo arranca Render.
+
+JSON
+
+{
+  "name": "urbanfix-backend",
+  "version": "1.2.0",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "node src/app.js",
+    "dev": "nodemon src/app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.18.2",
+    "googleapis": "^126.0.1"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
+📂 2. Archivo: src/config/googleSheets.js
+(Maneja la conexión segura).
+
+JavaScript
+
+const { google } = require('googleapis');
+const path = require('path');
+
+// ID de tu hoja de cálculo
+const SPREADSHEET_ID = '1cWAvN_DOG5U1vr-jg2_5YD19W1Vrt6CJxYRvTHCmtOs';
+
+const getAuth = () => {
+    let credentials;
+    try {
+        // 1. Producción: Busca la Variable de Entorno en Render
+        if (process.env.GOOGLE_CREDENTIALS) {
+            credentials = JSON.parse(process.env.GOOGLE_CREDENTIALS);
+            console.log("🔐 Credenciales cargadas desde ENV (Render)");
+        } 
+        // 2. Desarrollo: Busca el archivo local
+        else {
+            credentials = require(path.join(__dirname, '../../credentials.json')); 
+            console.log("📂 Credenciales cargadas desde archivo local");
+        }
+    } catch (e) {
+        console.error("❌ Error Crítico: No se encontraron credenciales de Google.");
+        console.error("Asegúrate de configurar la variable GOOGLE_CREDENTIALS en Render.");
+        console.error(e.message);
+        process.exit(1);
+    }
+
+    const auth = new google.auth.GoogleAuth({
+        credentials,
+        scopes: ['https://www.googleapis.com/auth/spreadsheets'],
+    });
+
+    return google.sheets({ version: 'v4', auth });
+};
+
+const sheets = getAuth();
+
+module.exports = { sheets, SPREADSHEET_ID };
+📂 3. Archivo: src/controllers/solicitudesController.js
+(La lógica principal. Nota: Ya tiene el require corregido con la 'S' mayúscula).
+
+JavaScript
+
+// IMPORTANTE: 'googleSheets' debe coincidir con el nombre del archivo en config
+const { sheets, SPREADSHEET_ID } = require('../config/googleSheets');
+
+const SHEET_NAME = 'Respuestas de formulario 1';
+const RANGE = `${SHEET_NAME}!A4:O`; 
+
+// Utilidad para limpiar headers
+const normalizeHeader = (header) => {
+    return header.toLowerCase()
+        .replace(/\s+/g, '_')
+        .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+        .replace(/[^a-z0-9_]/g, '');
+};
+
+// --- OBTENER TODOS ---
+const getSolicitudes = async (req, res, next) => {
+    try {
+        const response = await sheets.spreadsheets.values.get({
+            spreadsheetId: SPREADSHEET_ID,
+            range: RANGE,
+        });
+
+        const rows = response.data.values || [];
+        if (rows.length === 0) return res.json({ solicitudes: [] });
+
+        const headers = rows[0].map(normalizeHeader);
+        
+        const data = rows.slice(1).map((row, index) => {
+            let obj = { id: `sheet-${index + 1}`, sheetRowIndex: index + 5 };
+            headers.forEach((h, i) => obj[h] = row[i] || '');
+            return obj;
+        });
+
+        res.json({ solicitudes: data });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// --- DASHBOARD SUMMARY ---
+const getDashboardSummary = async (req, res, next) => {
+    try {
+        const response = await sheets.spreadsheets.values.get({
+            spreadsheetId: SPREADSHEET_ID,
+            range: RANGE,
+        });
+        
+        const rows = response.data.values || [];
+        if (rows.length <= 1) return res.json({ total: 0, pendientes: 0, finalizadas: 0 });
+
+        // Ajustar índice si cambia la columna de ESTADO (J = índice 9)
+        const STATUS_INDEX = 9; 
+        
+        let pendientes = 0;
+        let finalizadas = 0;
+
+        rows.slice(1).forEach(row => {
+            const estado = (row[STATUS_INDEX] || 'PENDIENTE').toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+            
+            const listaPendientes = ['PENDIENTE', 'NUEVO', 'COTIZADO', 'EN PROCESO', 'ACEPTADO', 'VISITA COTIZADA', 'VISITA AGENDADA', 'COTIZADO (PV)'];
+            const listaFinalizadas = ['FINALIZADO', 'CERRADO'];
+
+            if (listaPendientes.includes(estado)) pendientes++;
+            else if (listaFinalizadas.includes(estado)) finalizadas++;
+        });
+
+        res.json({ total: rows.length - 1, pendientes, finalizadas });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// --- CREAR SOLICITUD ---
+const createSolicitud = async (req, res, next) => {
+    try {
+        const { nombre_apellido, telefono, direccion, categoria_trabajo, descripcion_problema, urgencia, ventanas_horarias } = req.body;
+        
+        const marcaTemporal = new Date().toLocaleString('es-AR', { timeZone: 'America/Argentina/Buenos_Aires' });
+        
+        const newRow = [
+            marcaTemporal,          // A
+            nombre_apellido || '',  // B
+            telefono || '',         // C
+            direccion || '',        // D
+            categoria_trabajo || '',// E
+            descripcion_problema || '', // F
+            '',                     // G (Link Fotos)
+            urgencia || '',         // H
+            ventanas_horarias || '',// I
+            'NUEVO',                // J (Estado)
+            '', '', '', '', ''      // K-O (Vacíos)
+        ];
+
+        await sheets.spreadsheets.values.append({
+            spreadsheetId: SPREADSHEET_ID,
+            range: `${SHEET_NAME}!A:O`,
+            valueInputOption: 'USER_ENTERED',
+            insertDataOption: 'INSERT_ROWS',
+            resource: { values: [newRow] },
+        });
+
+        res.status(201).json({ success: true, message: 'Solicitud creada exitosamente.' });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// --- ACTUALIZAR (PATCH) ---
+const updateSolicitud = async (req, res, next) => {
+    try {
+        const { sheetRowIndex, newStatus, newMonto, newPresupuesto } = req.body;
+        
+        if (!sheetRowIndex) throw new Error("Falta sheetRowIndex");
+
+        await sheets.spreadsheets.values.batchUpdate({
+            spreadsheetId: SPREADSHEET_ID,
+            resource: {
+                valueInputOption: 'USER_ENTERED',
+                data: [
+                    { range: `${SHEET_NAME}!J${sheetRowIndex}`, values: [[newStatus]] },
+                    { range: `${SHEET_NAME}!K${sheetRowIndex}`, values: [[newPresupuesto]] },
+                    { range: `${SHEET_NAME}!L${sheetRowIndex}`, values: [[newMonto]] }
+                ]
+            }
+        });
+
+        res.json({ success: true, message: `Fila ${sheetRowIndex} actualizada.` });
+    } catch (error) {
+        next(error);
+    }
+};
+
+// --- ELIMINAR ---
+const deleteSolicitud = async (req, res, next) => {
+    try {
+        const { sheetRowIndex } = req.body;
+        if (!sheetRowIndex) throw new Error("Falta sheetRowIndex");
+
+        await sheets.spreadsheets.values.clear({
+            spreadsheetId: SPREADSHEET_ID,
+            range: `${SHEET_NAME}!A${sheetRowIndex}:O${sheetRowIndex}`,
+        });
+
+        res.json({ success: true, message: `Fila ${sheetRowIndex} limpiada.` });
+    } catch (error) {
+        next(error);
+    }
+};
+
+module.exports = {
+    getSolicitudes,
+    getDashboardSummary,
+    createSolicitud,
+    updateSolicitud,
+    deleteSolicitud
+};
+📂 4. Archivo: src/routes/apiRoutes.js
+(El mapa de rutas).
+
+JavaScript
+
+const express = require('express');
+const router = express.Router();
+const controller = require('../controllers/solicitudesController');
+
+// Rutas API
+router.get('/solicitudes-sheet', controller.getSolicitudes);
+router.get('/dashboard-summary', controller.getDashboardSummary);
+router.post('/crear-solicitud', controller.createSolicitud);
+router.patch('/update-solicitud', controller.updateSolicitud);
+router.delete('/eliminar-solicitud', controller.deleteSolicitud);
+
+module.exports = router;
+📂 5. Archivo: src/app.js
+(El servidor principal y punto de entrada).
+
+JavaScript
+
+const express = require('express');
+const cors = require('cors');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// --- CONFIGURACIÓN CORS ---
+const allowedOrigins = [
+    'http://localhost:3000', 
+    'http://localhost:3001',
+    'http://localhost:5173',
+    'https://urbanfix-frontend.vercel.app'
+];
+
+app.use(cors({
+    origin: (origin, callback) => {
+        // Permitir requests sin origen (como Postman o Apps móbiles)
+        if (!origin) return callback(null, true);
+        
+        // Permitir dominios listados O cualquier subdominio de vercel.app
+        if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+            return callback(null, true);
+        }
+        
+        console.warn(`⚠️ Bloqueo CORS para origen: ${origin}`);
+        callback(new Error('No permitido por CORS'));
+    }
+}));
+
+app.use(express.json());
+
+// Ruta Base
+app.get('/', (req, res) => res.send('🚀 UrbanFix API Online v1.2'));
+
+// Conectar Rutas
+app.use('/api', require('./routes/apiRoutes'));
+
+// --- MANEJO DE ERRORES GLOBAL ---
+app.use((err, req, res, next) => {
+    console.error("🔥 Error:", err.message);
+    
+    // Detalles extra si es error de Google
+    if (err.response && err.response.data) {
+        console.error("🔍 Detalle Google:", JSON.stringify(err.response.data));
+    }
+
+    res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+        error: process.env.NODE_ENV === 'development' ? err.message : 'Error procesando la solicitud'
+    });
+});
+
+// Iniciar
+app.listen(PORT, () => {
+    console.log(`✅ Servidor corriendo en puerto ${PORT}`);
+    console.log(`📂 Entorno: ${process.env.NODE_ENV || 'Desarrollo'}`);
+});
+✅ Última Verificación
+Asegúrate de que tu estructura de carpetas se vea exactamente así:
+
+Plaintext
+
+urbanfix-backend/
+├── src/
+│   ├── config/
+│   │   └── googleSheets.js
+│   ├── controllers/
+│   │   └── solicitudesController.js
+│   ├── routes/
+│   │   └── apiRoutes.js
+│   └── app.js
+├── package.json
+└── credentials.json
+Si tienes esto copiado tal cual, estás listo para cualquier cosa. ¡A desplegar! 🚀
