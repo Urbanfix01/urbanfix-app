@@ -1,7 +1,7 @@
 // src/routes/apiRoutes.js
 const express = require('express');
 const router = express.Router();
-const controller = require('../controllers/SolicitudesController');
+const controller = require('../controllers/solicitudesController');
 
 // Definición de endpoints
 router.get('/solicitudes-sheet', controller.getSolicitudes);
