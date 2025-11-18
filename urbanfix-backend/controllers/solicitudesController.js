@@ -31,7 +31,6 @@ const formatRowsToJSON = (rows) => {
 };
 
 const getSolicitudes = async (req, res) => {
-    // ✅ CORRECCIÓN DE CRASH: Definir READ_RANGE fuera del 'try'
     const READ_RANGE = `'${SHEET_NAME}'!A2:P`; 
 
     try {
@@ -39,6 +38,8 @@ const getSolicitudes = async (req, res) => {
         const response = await sheets.spreadsheets.values.get({
             spreadsheetId: SPREADSHEET_ID,
             range: READ_RANGE, 
+            // ✅ CORRECCIÓN FINAL: Esto fuerza a Sheets a enviar texto plano.
+            valueRenderOption: 'UNFORMATTED_VALUE', 
         });
         const rows = response.data.values;
         const solicitudesJSON = formatRowsToJSON(rows);
