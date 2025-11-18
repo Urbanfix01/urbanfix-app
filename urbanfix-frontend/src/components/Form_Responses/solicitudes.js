@@ -12,6 +12,18 @@ import { signOut } from 'firebase/auth';
 // ⛔ ELIMINADO: La constante API_BASE_URL
 
 // --- Componente Navbar (Se mantiene idéntico) ---
+const formatExcelDate = (serial) => {
+   if (!serial) return 'N/A';
+   // Si ya es un string con fecha (ej: "27/10/2025"), lo devolvemos tal cual
+   if (typeof serial === 'string' && serial.includes('/')) return serial;
+   
+   // Excel base date hack
+   const utc_days  = Math.floor(serial - 25569);
+   const utc_value = utc_days * 86400;                                      
+   const date_info = new Date(utc_value * 1000);
+   
+   return date_info.toLocaleDateString('es-AR'); // O tu locale preferido
+};
 const DashboardNavbar = ({ userEmail, onLogout }) => {
     return (
         <Navbar expand="lg" className="dashboard-navbar" data-bs-theme="dark">
