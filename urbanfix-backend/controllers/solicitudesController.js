@@ -20,6 +20,10 @@ const HEADERS = [
 
 const formatRowsToJSON = (rows) => {
     if (!rows || rows.length === 0) return [];
+    // 🚨 DEBUGGING: ¡ESTO NOS DIRÁ LA VERDAD!
+    console.log("--- DEBUG: FILA CRUDA RECIBIDA DE GOOGLE ---");
+    console.log(JSON.stringify(rows[0])); 
+    console.log("--------------------------------------------");
     return rows.map((row, index) => {
         const solicitud = {};
         HEADERS.forEach((header, i) => {
