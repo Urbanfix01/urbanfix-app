@@ -12,10 +12,22 @@ const SHEET_NAME = 'Form_Responses'; // <-- ESTO ESTÁ MAL. ARRéGLALO.
 
 
 const HEADERS = [
-    'MARCA_TEMPORAL', 'NOMBRE_APELLIDO', 'TELEFONO', 'DIRECCION', 
-    'CATEGORIA_TRABAJO', 'DESCRIPCION_PROBLEMA', 'FOTOS_VIDEOS', 'URGENCIA',
-    'VENTANAS_HORARIAS', 'ESTADO', 'PRESUPUESTO', 'MONTO_COTIZADO',
-    'LINK_PAGO', 'NOTAS', 'PAGO_RECIBIDO', 'COLUMNA_P_EXTRA'
+    'marca_temporal',      // Antes: 'MARCA_TEMPORAL'
+    'nombre_apellido',     // Antes: 'NOMBRE_APELLIDO'
+    'telefono',            // Antes: 'TELEFONO'
+    'direccion',           // Antes: 'DIRECCION'
+    'categoria_trabajo',   // Antes: 'CATEGORIA_TRABAJO'
+    'descripcion_problema',// Antes: 'DESCRIPCION_PROBLEMA'
+    'fotos_videos',        // Antes: 'FOTOS_VIDEOS'
+    'urgencia',            // Antes: 'URGENCIA'
+    'ventanas_horarias',   // Antes: 'VENTANAS_HORARIAS'
+    'estado',              // Antes: 'ESTADO'
+    'presupuesto',         // Antes: 'PRESUPUESTO'
+    'monto_cotizado',      // Antes: 'MONTO_COTIZADO'
+    'link_pago',           // Antes: 'LINK_PAGO'
+    'notas',               // Antes: 'NOTAS'
+    'pago_recibido',       // Antes: 'PAGO_RECIBIDO'
+    'columna_p_extra'      // Antes: 'COLUMNA_P_EXTRA'
 ];
 
 const formatRowsToJSON = (rows) => {
