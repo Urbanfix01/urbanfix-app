@@ -1,0 +1,302 @@
+/* ================================================
+Archivo de Estilos Globales de URBANFIX
+Contiene:
+1. Variables de Color (Branding)
+2. Estilos del Login (Panel Dual)
+3. Estilos del Formulario de Solicitud (Inputs, Radios)
+8. Estilos del Dashboard (Navbar, Tarjetas)
+9. Estilos de la Tabla de Solicitudes
+10. Sobrescritura de Botones Bootstrap
+================================================
+*/
+
+/* ---------------------------------
+1. Variables de Color (Branding)
+---------------------------------
+*/
+:root {
+    /* Naranja principal de la marca (para botones, acentos) */
+    --uf-primary: #FF8A3D; 
+    
+    /* Gris oscuro para texto y cabeceras */
+    --uf-secondary: #3A3B3C; 
+    
+    /* Verde para éxito/completado */
+    --uf-success: #198754; 
+    
+    /* Fondo gris claro para el panel de admin */
+    --uf-light-bg: #f8f9fa;
+}
+
+
+/* ---------------------------------
+2. Estilos del Login (Panel Dual)
+y Formulario de Solicitud
+---------------------------------
+*/
+
+/* Contenedor de la página (fondo degradado) */
+.login-page-container {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+    background: linear-gradient(45deg, var(--uf-primary) 0%, #ffc107 100%);
+}
+
+/* Tarjeta principal (Login y Formulario) */
+.login-card {
+    border-radius: 1.5rem !important; /* 24px */
+    border: none;
+    overflow: hidden; /* Importante para el diseño dual-panel */
+    background-color: #ffffff;
+    box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+
+/* Panel Naranja Superior (Solo Login) */
+.login-header-panel {
+    background: var(--uf-primary);
+    background: linear-gradient(25deg, var(--uf-primary) 0%, #ffa55f 100%);
+    color: white;
+    padding: 2.5rem;
+    text-align: center;
+}
+
+/* Título ¡Hola! */
+.welcome-title {
+    font-weight: 700;
+    font-size: 2.5rem; /* 40px */
+}
+/* Subtítulo */
+.welcome-subtext {
+    font-weight: 300;
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+/* Botón "Solicitar Presupuesto" (Outline Blanco) */
+.btn-outline-light-uf {
+    border-width: 2px !important;
+    border-color: rgba(255, 255, 255, 0.8) !important;
+    color: white !important;
+    font-weight: 600 !important;
+    padding: 0.6rem 1.5rem !important;
+    border-radius: 50px !important; /* Pill shape */
+    transition: all 0.3s ease;
+}
+.btn-outline-light-uf:hover {
+    background-color: white !important;
+    color: var(--uf-primary) !important;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+/* Panel Blanco Inferior (Formulario Login) */
+.login-form-panel {
+    background-color: #ffffff;
+}
+
+/* Título "ACCESO ADMINISTRADOR" */
+.user-login-title {
+    color: var(--uf-secondary);
+    font-weight: 700;
+    font-size: 1.25rem;
+    letter-spacing: 0.5px;
+    border-bottom: 3px solid var(--uf-primary);
+    padding-bottom: 8px;
+    display: inline-block; /* Para que el borde se ajuste al texto */
+}
+
+/* Link "Olvidaste tu contraseña" */
+.forgot-password-link {
+    color: #6c757d;
+    font-size: 0.9rem;
+    text-decoration: none;
+}
+.forgot-password-link:hover {
+    color: var(--uf-primary);
+    text-decoration: underline;
+}
+
+
+/* ---------------------------------
+3. Estilos del Formulario de Solicitud
+---------------------------------
+*/
+
+/* Títulos de Sección (Datos, Detalles, etc.) */
+.form-section-title {
+    color: var(--uf-secondary);
+    font-weight: 600;
+    border-bottom: 2px solid #eee;
+    padding-bottom: 8px;
+    margin-bottom: 1.5rem !important;
+}
+
+/* Etiquetas personalizadas (Labels) */
+.form-label-custom {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--uf-primary); /* Color naranja */
+}
+
+/* Estilos de Foco para Inputs, Selects y Textareas */
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--uf-primary) !important;
+    box-shadow: 0 0 0 0.25rem rgba(255, 138, 61, 0.25) !important;
+}
+
+/* Estilos de Foco para Radios y Checkboxes */
+.form-check-input:checked {
+    background-color: var(--uf-primary) !important;
+    border-color: var(--uf-primary) !important;
+}
+.form-check-input:focus {
+    border-color: var(--uf-primary) !important;
+    box-shadow: 0 0 0 0.25rem rgba(255, 138, 61, 0.25) !important;
+}
+
+
+/* ---------------------------------
+8. Estilos del Dashboard
+---------------------------------
+*/
+
+/* Navbar del Admin (Naranja) */
+.dashboard-navbar {
+    background-color: var(--uf-primary) !important;
+    background: linear-gradient(90deg, var(--uf-primary) 0%, #ffa55f 100%) !important;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+    box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Botón de Logout */
+.logout-button-uf {
+    border-width: 2px !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease;
+}
+.logout-button-uf:hover {
+    background-color: white !important;
+    color: var(--uf-primary) !important;
+}
+
+/* Contenedor principal del contenido del Dashboard (Fondo Gris) */
+.dashboard-content {
+    background-color: var(--uf-light-bg);
+    min-height: calc(100vh - 74px); /* 100% alto menos la navbar */
+}
+
+/* Título principal H1 del Dashboard */
+.dashboard-title {
+    font-weight: 700;
+    color: var(--uf-secondary);
+    font-size: 2.25rem;
+}
+
+/* Tarjetas de Estadísticas (Base) */
+.stat-card {
+    border-radius: 0.75rem !important; /* 12px */
+    border: 1px solid #e9ecef;
+    border-left-width: 6px !important; /* Borde izquierdo grueso */
+    transition: all 0.3s ease;
+}
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.07), 0 4px 6px -4px rgb(0 0 0 / 0.07);
+}
+.stat-card .stat-card-number {
+    font-weight: 700;
+    font-size: 3rem; /* 48px */
+}
+.stat-card .stat-card-title {
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    font-size: 0.8rem;
+    letter-spacing: 0.5px;
+}
+
+/* Colores de Tarjetas de Estadísticas */
+.stat-card.pending {
+    border-left-color: var(--uf-primary) !important;
+}
+.stat-card.pending .stat-card-number {
+    color: var(--uf-primary);
+}
+
+.stat-card.completed {
+    border-left-color: var(--uf-success) !important;
+}
+.stat-card.completed .stat-card-number {
+    color: var(--uf-success);
+}
+
+.stat-card.total {
+    border-left-color: var(--uf-secondary) !important;
+}
+.stat-card.total .stat-card-number {
+    color: var(--uf-secondary);
+}
+
+
+/* ---------------------------------
+9. Estilos de la Tabla de Solicitudes
+---------------------------------
+*/
+
+/* Cabecera de la Tabla (Gris Oscuro) */
+.uf-table-header {
+    background-color: var(--uf-secondary) !important;
+    color: white;
+}
+.uf-table-header th {
+    /* Sobrescribe el color de texto si es necesario */
+    color: white !important;
+}
+
+
+/* ---------------------------------
+10. Sobrescritura de Botones Bootstrap
+(Define Naranja como 'primary')
+---------------------------------
+*/
+
+/* Botón Sólido (Principal) */
+.btn-primary {
+    background-color: var(--uf-primary) !important;
+    border-color: var(--uf-primary) !important;
+    font-weight: 600 !important;
+    color: white !important;
+    transition: all 0.3s ease;
+}
+.btn-primary:hover,
+.btn-primary:focus,
+.btn-primary:active {
+    background-color: #e67329 !important; /* Naranja más oscuro */
+    border-color: #e67329 !important;
+    box-shadow: 0 0 0 0.25rem rgba(255, 138, 61, 0.5) !important;
+}
+.btn-primary:disabled {
+    background-color: #ffb58a !important;
+    border-color: #ffb58a !important;
+}
+
+/* Botón Outline (Secundario) */
+.btn-outline-primary {
+    color: var(--uf-primary) !important;
+    border-color: var(--uf-primary) !important;
+    font-weight: 600 !important;
+    transition: all 0.3s ease;
+}
+.btn-outline-primary:hover,
+.btn-outline-primary:focus,
+.btn-outline-primary:active {
+    background-color: var(--uf-primary) !important;
+    color: white !important;
+    box-shadow: 0 0 0 0.25rem rgba(255, 138, 61, 0.5) !important;
+}
