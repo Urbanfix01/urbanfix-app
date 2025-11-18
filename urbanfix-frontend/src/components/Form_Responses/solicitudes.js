@@ -1,16 +1,15 @@
 import React, { useState, useEffect } from 'react';
-// ⛔ ELIMINADO: import axios from 'axios';
-// ✅ AÑADIDO: Importamos nuestras funciones centralizadas
+// ✅ CORRECCIÓN 1 (CRASH): Cambiamos la ruta de '../AuthContext' a '../../AuthContext'
+// para subir dos niveles: de Form_Responses -> components -> src
 import { getSolicitudes, updateSolicitud, deleteSolicitud } from '../services/api';
 import { Container, Table, Button, Form, Alert, Spinner, Stack, Row, Col, Modal, ListGroup, Card, Navbar, Nav } from 'react-bootstrap'; 
 import { ArrowClockwise, PencilFill, CurrencyDollar, EyeFill, TrashFill, SaveFill, XCircleFill } from 'react-bootstrap-icons';
 import { Link, useNavigate } from 'react-router-dom';
-import { useAuth } from '../AuthContext'; 
-import { auth } from '../firebase'; 
+import { useAuth } from '../../AuthContext'; // <--- FIX HERE
+import { auth } from '../../firebase'; // <--- Y AQUÍ
 import { signOut } from 'firebase/auth';
 
 // ⛔ ELIMINADO: La constante API_BASE_URL
-// (Nuestra capa de servicio 'api.js' ahora maneja esto automáticamente)
 
 // --- Componente Navbar (Se mantiene idéntico) ---
 const DashboardNavbar = ({ userEmail, onLogout }) => {
@@ -42,7 +41,7 @@ const DashboardNavbar = ({ userEmail, onLogout }) => {
 };
 
 
-// --- Función Auxiliar de Estado (Se mantiene idéntica) ---
+// --- Función Auxiliar de Estado (Se mantiene idéntico) ---
 const getStatusVariant = (estado) => {
     const estadoNorm = estado?.toUpperCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "") || 'PENDIENTE';
 
@@ -106,8 +105,8 @@ const Solicitudes = () => {
         try {
             // 1. Usamos el servicio
             const data = await getSolicitudes();
-            // 2. El servicio ya parsea el JSON, accedemos a la propiedad 'solicitudes'
-            setSolicitudes(data.solicitudes || []); 
+            // 2. ✅ CORRECCIÓN 2 (0/0): El backend devuelve 'data: [...]', no 'solicitudes: [...]'
+            setSolicitudes(data.data || []); 
         } catch (err) {
             // 3. El error ya viene formateado desde 'handleResponse'
             console.error("Error al obtener solicitudes:", err);
@@ -265,8 +264,8 @@ const Solicitudes = () => {
     // --- Lógica de Filtro (Se mantiene idéntica) ---
     const filteredSolicitudes = solicitudes.filter(sol => {
         const matchesSearch = sol.nombre_apellido?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            sol.direccion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                            sol.telefono?.includes(searchTerm);
+                             sol.direccion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                             sol.telefono?.includes(searchTerm);
         const matchesStatus = statusFilter ? sol.estado === statusFilter : true;
         return matchesSearch && matchesStatus;
     });
@@ -358,11 +357,11 @@ const Solicitudes = () => {
 
                     {/* --- Tabla de Solicitudes --- */}
                     {!loading && filteredSolicitudes.length === 0 && (
-                         <Alert variant="info" className="text-center">
-                             {solicitudes.length === 0 
-                                 ? "No hay solicitudes para mostrar." 
-                                 : "No se encontraron solicitudes que coincidan con la búsqueda."}
-                         </Alert>
+                             <Alert variant="info" className="text-center">
+                                 {solicitudes.length === 0 
+                                     ? "No hay solicitudes para mostrar." 
+                                     : "No se encontraron solicitudes que coincidan con la búsqueda."}
+                             </Alert>
                     )}
 
                     {filteredSolicitudes.length > 0 && (
