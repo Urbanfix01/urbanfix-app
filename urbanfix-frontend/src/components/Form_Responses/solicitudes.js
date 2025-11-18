@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 // ✅ CORRECCIÓN 1 (CRASH): Cambiamos la ruta de '../AuthContext' a '../../AuthContext'
 // para subir dos niveles: de Form_Responses -> components -> src
-import { getSolicitudes, updateSolicitud, deleteSolicitud } from '../services/api';
+import { getSolicitudes, updateSolicitud, deleteSolicitud } from '../../services/api';
 import { Container, Table, Button, Form, Alert, Spinner, Stack, Row, Col, Modal, ListGroup, Card, Navbar, Nav } from 'react-bootstrap'; 
 import { ArrowClockwise, PencilFill, CurrencyDollar, EyeFill, TrashFill, SaveFill, XCircleFill } from 'react-bootstrap-icons';
 import { Link, useNavigate } from 'react-router-dom';
