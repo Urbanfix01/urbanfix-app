@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 // ✅ CORRECCIÓN DE RUTA: Cambiado de '../../' a '../'
-import { getSolicitudes, updateSolicitud, deleteSolicitud } from '../../services/api';
+import { getSolicitudes, updateSolicitud, deleteSolicitud, createSolicitud } from '../../services/api';
 import { Container, Row, Col, Form, Button, Card, Alert, Spinner } from 'react-bootstrap'; 
 import { Link } from 'react-router-dom';
 
