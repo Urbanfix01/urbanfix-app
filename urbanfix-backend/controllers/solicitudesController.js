@@ -39,7 +39,7 @@ const getSolicitudes = async (req, res) => {
             spreadsheetId: SPREADSHEET_ID,
             range: READ_RANGE, 
             // ✅ CORRECCIÓN FINAL: Esto fuerza a Sheets a enviar texto plano.
-            valueRenderOption: 'UNFORMATTED_VALUE', 
+            valueRenderOption: 'UNFORMATTED_VALUE',
         });
         const rows = response.data.values;
         const solicitudesJSON = formatRowsToJSON(rows);
