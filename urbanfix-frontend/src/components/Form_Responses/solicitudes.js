@@ -261,14 +261,16 @@ const Solicitudes = () => {
         );
     }
 
-    // --- Lógica de Filtro (Se mantiene idéntica) ---
-    const filteredSolicitudes = solicitudes.filter(sol => {
-        const matchesSearch = sol.nombre_apellido?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             sol.direccion?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                             sol.telefono?.includes(searchTerm);
-        const matchesStatus = statusFilter ? sol.estado === statusFilter : true;
-        return matchesSearch && matchesStatus;
-    });
+   // --- Lógica de Filtro (Corrección de NULOS) ---
+const filteredSolicitudes = solicitudes.filter(sol => {
+    // ✅ FIX: Usamos (sol.campo || '') para asegurar que el valor nunca sea null antes de buscar.
+    const matchesSearch = (sol.nombre_apellido || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (sol.direccion || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          (sol.telefono || '').includes(searchTerm);
+                          
+    const matchesStatus = statusFilter ? sol.estado === statusFilter : true;
+    return matchesSearch && matchesStatus;
+});
 
     // --- RENDERIZADO PRINCIPAL (Se mantiene idéntico, pero con manejo de error en línea) ---
     return (
