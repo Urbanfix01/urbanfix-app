@@ -67,18 +67,17 @@ const Dashboard = () => {
             setLoading(true); 
             setError(null); // Limpiamos error anterior
             try {
-                // 1. Llamamos a nuestra nueva función del servicio
-                // 'data' ya es el objeto JSON parseado
+
                 const data = await getDashboardSummary();
-                setSummary(data);
+                setSummary(data.data || { total: 0, pendientes: 0, finalizadas: 0 });
             } catch (err) {
                 // 'err.message' viene del error lanzado en 'api.js'
                 console.error("Error al cargar el resumen del dashboard:", err);
                 setError(err.message); // Guardamos el error para la UI
-                setSummary({ total: '!', pendientes: '!', finalizadas: '!' }); 
-            } finally {
-                setLoading(false);
-            }
+                setSummary({ total: 0, pendientes: 0, finalizadas: 0 }); // Valores seguros en caso de error
+    } finally {
+        setLoading(false);
+    }
         };
 
         fetchSummary();
