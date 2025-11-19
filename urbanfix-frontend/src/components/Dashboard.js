@@ -74,7 +74,7 @@ const Dashboard = () => {
                 // 'err.message' viene del error lanzado en 'api.js'
                 console.error("Error al cargar el resumen del dashboard:", err);
                 setError(err.message); // Guardamos el error para la UI
-                setSummary({ total: 0, pendientes: 0, finalizadas: 0 }); // Valores seguros en caso de error
+                setSummary({ total: 0, pendientes: 0, finalizadas: 0, }); // Valores seguros en caso de error
     } finally {
         setLoading(false);
     }
