@@ -47,7 +47,7 @@ const Dashboard = () => {
     const navigate = useNavigate(); 
     const location = useLocation();
 
-    const [summary, setSummary] = useState({ total: 0, pendientes: 0, finalizadas: 0 });
+    const [summary, setSummary] = useState({ total: 0, pendientes: 0, finalizados: 0 });
     const [loading, setLoading] = useState(true);
     // ✅ AÑADIDO: Estado de error para la UI
     const [error, setError] = useState(null);
@@ -69,12 +69,12 @@ const Dashboard = () => {
             try {
 
                 const data = await getDashboardSummary();
-                setSummary(data.data || { total: 0, pendientes: 0, finalizadas: 0 });
+                setSummary(data.data || { total: 0, pendientes: 0, finalizados: 0 });
             } catch (err) {
                 // 'err.message' viene del error lanzado en 'api.js'
                 console.error("Error al cargar el resumen del dashboard:", err);
                 setError(err.message); // Guardamos el error para la UI
-                setSummary({ total: 0, pendientes: 0, finalizadas: 0, }); // Valores seguros en caso de error
+                setSummary({ total: 0, pendientes: 0, finalizados: 0, }); // Valores seguros en caso de error
     } finally {
         setLoading(false);
     }
@@ -144,8 +144,8 @@ const Dashboard = () => {
                         <Col md={4} className="mb-4">
                             <Card className="shadow-sm stat-card completed">
                                 <Card.Body>
-                                    <h2 className="stat-card-number">{renderStat(summary.finalizadas)}</h2>
-                                    <p className="stat-card-title">FINALIZADAS</p>
+                                    <h2 className="stat-card-number">{renderStat(summary.finalizados)}</h2>
+                                    <p className="stat-card-title">FINALIZADOS</p>
                                 </Card.Body>
                             </Card>
                         </Col>
