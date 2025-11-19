@@ -23,7 +23,7 @@ const handleResponse = async (response) => {
     try {
         const errorJson = JSON.parse(errorText);
         if (errorJson && errorJson.message) {
-            // ¡Perfecto! Es un error JSON enviado por nuestro backend
+          
             throw new Error(errorJson.message); 
         }
     } catch (e) {
