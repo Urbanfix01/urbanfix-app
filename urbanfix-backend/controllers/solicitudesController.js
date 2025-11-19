@@ -183,11 +183,46 @@ const getDashboardSummary = async (req, res) => {
         res.status(500).json({ success: false, message: 'Error al calcular el resumen.', error: error.message });
     }
 };
+// --- NUEVA FUNCIÓN: Obtener Lista de Precios ---
+const getListaPrecios = async (req, res) => {
+    // Leemos las columnas A (Categoría), B (Tarea) y C (Precio)
+    const PRICE_RANGE = `'Lista_Precios'!A2:C`;
+
+    try {
+        const response = await sheets.spreadsheets.values.get({
+            spreadsheetId: SPREADSHEET_ID,
+            range: PRICE_RANGE,
+            // Usamos UNFORMATTED_VALUE para recibir el precio como número (8000), no texto ("$8.000")
+            valueRenderOption: 'UNFORMATTED_VALUE'
+        });
+
+        const rows = response.data.values;
+
+        if (!rows || rows.length === 0) {
+            return res.status(200).json({ success: true, data: [] });
+        }
+
+        // Transformamos las filas en objetos JSON limpios
+        const lista = rows.map(row => ({
+            categoria: (row[0] || '').toString().trim(),
+            tarea: (row[1] || '').toString().trim(),
+            // Convertimos a número, si falla o está vacío ponemos 0
+            precio: Number(row[2]) || 0 
+        })).filter(item => item.tarea); // Eliminamos filas que no tengan nombre de tarea
+
+        res.status(200).json({ success: true, data: lista });
+
+    } catch (error) {
+        console.error(`Error [getListaPrecios]: ${error.message}`);
+        res.status(500).json({ success: false, message: 'Error al leer la lista de precios.', error: error.message });
+    }
+};
 
 module.exports = {
     getSolicitudes,
     createSolicitud,
     updateSolicitud,
     deleteSolicitud,
-    getDashboardSummary
+    getDashboardSummary,
+    getListaPrecios
 };

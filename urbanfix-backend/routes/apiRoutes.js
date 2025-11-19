@@ -9,5 +9,6 @@ router.get('/dashboard-summary', controller.getDashboardSummary);
 router.post('/crear-solicitud', controller.createSolicitud);
 router.patch('/update-solicitud', controller.updateSolicitud);
 router.delete('/eliminar-solicitud', controller.deleteSolicitud);
+router.get('/lista-precios', controller.getListaPrecios);
 
-module.exports = router;
+module.exports = router;    
