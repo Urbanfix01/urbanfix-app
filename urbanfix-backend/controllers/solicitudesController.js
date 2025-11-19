@@ -126,27 +126,59 @@ const deleteSolicitud = async (req, res) => {
 };
 
 const getDashboardSummary = async (req, res) => {
-    // ✅ CORRECCIÓN DE CRASH: Definir SUMMARY_RANGE fuera del 'try'
+    // 1. Definimos el rango fuera del try (para evitar el crash)
+    // Leemos la columna J (ESTADO) desde la fila 2 hasta el final
     const SUMMARY_RANGE = `'${SHEET_NAME}'!J2:J`;
 
     try {
-        const response = await sheets.spreadsheets.values.get({ spreadsheetId: SPREADSHEET_ID, range: SUMMARY_RANGE });
+        const response = await sheets.spreadsheets.values.get({ 
+            spreadsheetId: SPREADSHEET_ID, 
+            range: SUMMARY_RANGE,
+            // ✅ LA CURA MÁGICA: Forzamos texto plano
+            valueRenderOption: 'UNFORMATTED_VALUE' 
+        });
+        
         const rows = response.data.values;
-        if (!rows) return res.status(200).json({ success: true, data: { total: 0, pendientes: 0, nuevos: 0, cotizados: 0, finalizados: 0 }});
-        let total = rows.length, pendientes = 0, nuevos = 0, cotizados = 0, finalizados = 0;
+        
+        // Si no hay filas, devolvemos ceros
+        if (!rows) {
+            return res.status(200).json({ 
+                success: true, 
+                data: { total: 0, pendientes: 0, nuevos: 0, cotizados: 0, finalizados: 0 }
+            });
+        }
+
+        // Contadores
+        let total = 0;
+        let pendientes = 0;
+        let nuevos = 0;
+        let cotizados = 0;
+        let finalizados = 0;
+
         rows.forEach(row => {
-            const estado = (row[0] || '').toUpperCase();
-            switch (estado) {
-                case 'PENDIENTE': pendientes++; break;
-                case 'NUEVO': nuevos++; break;
-                case 'COTIZADO': cotizados++; break;
-                case 'FINALIZADO': finalizados++; break;
+            // Normalizamos el estado (mayúsculas, sin espacios extra)
+            // Si la celda está vacía, usamos una cadena vacía
+            const estado = (row[0] || '').toString().toUpperCase().trim();
+            
+            // Solo contamos si hay algo escrito
+            if (estado) {
+                total++;
+                
+                // Lógica de conteo
+                if (estado === 'PENDIENTE') pendientes++;
+                if (estado === 'NUEVO') nuevos++; // Asumiendo que 'NUEVO' cuenta como pendiente también? Ajusta si no.
+                if (estado.includes('COTIZADO') || estado === 'PRESUPUESTADO') cotizados++;
+                if (estado === 'FINALIZADO' || estado === 'CERRADO') finalizados++;
             }
         });
-        res.status(200).json({ success: true, data: { total, pendientes, nuevos, cotizados, finalizados } });
+
+        res.status(200).json({ 
+            success: true, 
+            data: { total, pendientes, nuevos, cotizados, finalizados } 
+        });
+
     } catch (error) {
         console.error(`Error [getDashboardSummary]: ${error.message}`);
-        // Ahora esto funciona y no crashea el servidor:
         console.error(`Rango que intentó leer: ${SUMMARY_RANGE}`); 
         res.status(500).json({ success: false, message: 'Error al calcular el resumen.', error: error.message });
     }
