@@ -10,7 +10,7 @@ let sheetsClient = null;
 // ====================================================================
 function getGoogleAuth() {
     
-    // ***** 🛠️ ESTA ES LA CORRECCIÓN MÁS IMPORTANTE 🛠️ *****
+    // ***** 🛠️ ESTA ES LA CORRECCIÓN MÁS IMPORTANTE 🛠️ ****
     // Añade el permiso (scope) de Google Drive para "encontrar" el archivo.
     const SCOPES = [
       'https://www.googleapis.com/auth/spreadsheets',
